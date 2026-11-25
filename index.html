@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonne nuit ma chérie</title>
+<style>
+  :root {
+    --nuit: #14123a;
+    --nuit-2: #2a2166;
+    --lune: #fff3c4;
+    --rose: #ff9fc2;
+    --texte: #fdf6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--texte);
+    background: radial-gradient(ellipse at top, var(--nuit-2), var(--nuit) 70%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  canvas { position: fixed; inset: 0; z-index: 0; }
+  .lune {
+    position: fixed; top: 6vh; right: 8vw;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: var(--lune);
+    box-shadow: 0 0 60px 15px rgba(255, 243, 196, .35);
+    z-index: 1;
+  }
+  .lune::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: var(--nuit-2); transform: translate(26px, -8px) scale(.85);
+    opacity: .9;
+  }
+  main { position: relative; z-index: 2; padding: 24px; max-width: 560px; }
+  h1 { font-size: clamp(2rem, 7vw, 3.2rem); font-weight: normal; margin-bottom: 18px; }
+  #message { font-size: clamp(1.1rem, 4vw, 1.5rem); line-height: 1.6; min-height: 5em; }
+  button {
+    margin-top: 28px; padding: 14px 28px; border: 0; border-radius: 999px;
+    background: var(--rose); color: #3a0f27; font: inherit; font-size: 1.05rem; cursor: pointer;
+    transition: transform .2s;
+  }
+  button:hover { transform: scale(1.06); }
+  button:focus-visible { outline: 3px solid var(--lune); outline-offset: 3px; }
+  .coeur {
+    position: fixed; bottom: -40px; z-index: 1; pointer-events: none;
+    animation: monte 4s linear forwards;
+  }
+  @keyframes monte { to { transform: translateY(-110vh); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .coeur { animation-duration: 0.01s; } }
+</style>
+</head>
+<body>
+<canvas id="etoiles"></canvas>
+<div class="lune" aria-hidden="true"></div>
+
+<main>
+  <h1>Bonne nuit ma chérie 🌙</h1>
+  <p id="message"></p>
+  <button id="btn">Un dernier câlin 💗</button>
+</main>
+
+<script>
+  // ---- Message écrit lettre par lettre ----
+  const texte = "Bonne nuit à toi aussi ma chérie. Pense bien à ton youyou. Fais de beaux rêves, je pense à toi.";
+  const el = document.getElementById("message");
+  let i = 0;
+  function ecrire() {
+    if (i < texte.length) {
+      el.textContent += texte[i++];
+      setTimeout(ecrire, 55);
+    }
+  }
+  ecrire();
+
+  // ---- Étoiles scintillantes ----
+  const canvas = document.getElementById("etoiles");
+  const ctx = canvas.getContext("2d");
+  let etoiles = [];
+  function init() {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    etoiles = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.6 + .3,
+      p: Math.random() * Math.PI * 2
+    }));
+  }
+  function dessiner(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const e of etoiles) {
+      ctx.globalAlpha = .4 + .6 * Math.abs(Math.sin(t / 900 + e.p));
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(dessiner);
+  }
+  addEventListener("resize", init);
+  init();
+  requestAnimationFrame(dessiner);
+
+  // ---- Cœurs au clic ----
+  document.getElementById("btn").addEventListener("click", () => {
+    for (let k = 0; k < 18; k++) {
+      const c = document.createElement("div");
+      c.className = "coeur";
+      c.textContent = ["💗", "💖", "💕", "✨"][Math.floor(Math.random() * 4)];
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.fontSize = 18 + Math.random() * 26 + "px";
+      c.style.animationDelay = Math.random() * 0.8 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }
+  });
+</script>
+</body>
+</html>
